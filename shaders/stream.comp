@@ -1,0 +1,61 @@
+
+#version 430
+
+layout(local_size_x=16, local_size_y=16) in;
+
+struct Ball{
+    vec4 pos;
+    vec4 col;
+};
+
+layout(std430, binding=0) buffer balls_in{
+    Ball balls[];
+}In;
+
+layout(std430, binding=1) buffer balls_out{
+    Ball balls[];
+}Out;
+
+uniform sampler2D texture0;
+uniform float speed;
+uniform int length;
+
+void main(){
+    int curBallIndex = int(gl_GlobalInvocationID);
+
+    Ball in_ball = In.balls[curBallIndex];
+
+    vec2 center = in_ball.pos.xy;
+    
+    //center = mod(center, vec2(1000, 1000));
+    if(center.x < 0 || center.x > 1000){
+        center.x = pow(fract(center.x*100), 2)*1000.0;
+        center.y = pow(fract(center.y*100), 2)*1000.0;
+    }
+    if(center.y < 0 || center.y > 1000){
+        center.x = pow(fract(center.x*100), 2)*1000.0;
+        center.y = pow(fract(center.y*100), 2)*1000.0;
+    }
+    
+
+    for(int i = 0; i < length; i++){
+        ivec2 center_int = ivec2(floor(center));
+        vec2 center_fract = center-center_int;
+        vec2 flow = vec2(0, 0);
+        flow += texelFetch(texture0, center_int-ivec2(0, 0), 0).xy*(1-center_fract.x)*(1-center_fract.y);
+        flow += texelFetch(texture0, center_int-ivec2(1, 0), 0).xy*(  center_fract.x)*(1-center_fract.y);
+        flow += texelFetch(texture0, center_int-ivec2(0, 1), 0).xy*(1-center_fract.x)*(  center_fract.y);
+        flow += texelFetch(texture0, center_int-ivec2(1, 1), 0).xy*(  center_fract.x)*(  center_fract.y);
+
+        center += flow*speed;
+    }
+    
+
+    Ball out_ball;
+    out_ball.pos.xyzw = vec4(center.xy, in_ball.pos.zw);
+    out_ball.col.xyzw = in_ball.col;//in_ball.col.xyzw;
+
+    Out.balls[curBallIndex] = out_ball;
+
+
+}

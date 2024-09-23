@@ -11,6 +11,6 @@ out vec4 fragColor;
 
 void main() {
     vec4 col = texture(texture0, uv);
-    fragColor = vec4(col.z*abs(col.x)*3, col.z*abs(col.y), col.z*1.75, 1.0);
+    fragColor = vec4(abs(col.x)*5, abs(col.y)*1.5, 1.75, 2*col.z);
 }
 
