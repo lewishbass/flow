@@ -37,7 +37,7 @@ class Simulation(arcade.Window):
         self.frame_num = 0
         self.pause = False
 
-        super().__init__(width, height, "Flow Simulation", gl_version=(4, 3), resizable=True)
+        super().__init__(width, height, "Flow Simulation", gl_version=(4, 3), resizable=False)
         self.ctx.enable(self.ctx.BLEND)
         self.center_window()
         
@@ -84,7 +84,7 @@ class Simulation(arcade.Window):
         self.stream_compute['length'] = 40
 
         self.sim_res_x = 1000
-        self.sim_res_y = 1000   
+        self.sim_res_y = 1000
         
         # init textures
         # fluid format   vx,   vy,   temp
@@ -111,9 +111,9 @@ class Simulation(arcade.Window):
         # smoke emitter
         self.smoke_in = self.ctx.texture((self.sim_res_x, self.sim_res_y), components=3, dtype='f4', filter=(self.ctx.NEAREST, self.ctx.NEAREST), wrap_x=self.ctx.CLAMP_TO_EDGE, wrap_y=self.ctx.CLAMP_TO_EDGE)
         self.smoke_in.write(array('f', 
-                                  self.gen_initial_data(self.sim_res_x, self.sim_res_y, self.sim_res_x/4  , self.sim_res_y/12, 40, 0.5, 0)+
-                                  self.gen_initial_data(self.sim_res_x, self.sim_res_y, self.sim_res_x/4*3, self.sim_res_y/12, 40, 0.5, 0)+
-                                  self.gen_initial_data(self.sim_res_x, self.sim_res_y, self.sim_res_x/2  , self.sim_res_y/8 , 70, 0.5, 0)
+                                  self.gen_initial_data(self.sim_res_x, self.sim_res_y, self.sim_res_x/4  , self.sim_res_y/12, 20, 0.5, 0)+
+                                  self.gen_initial_data(self.sim_res_x, self.sim_res_y, self.sim_res_x/4*3, self.sim_res_y/12, 20, 0.5, 0)+
+                                  self.gen_initial_data(self.sim_res_x, self.sim_res_y, self.sim_res_x/2  , self.sim_res_y/8 , 30, 0.5, 0)
                                   ))
         
 
@@ -169,7 +169,7 @@ class Simulation(arcade.Window):
             self.fb_gauss.use()
             self.fb_gauss.clear()
 
-            self.advec_sim['speed'] = 1
+            self.advec_sim['speed'] = 0.5
             self.quad_fs.render(self.advec_sim) # advect velocities
             
             self.fluid   , self.gauss    = self.gauss   , self.fluid
